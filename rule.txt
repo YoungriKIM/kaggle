@@ -1,0 +1,6 @@
+대회 주소
+https://www.kaggle.com/c/tabular-playground-series-apr-2021/data?select=train.csv
+
+참고할 타이타닉 주소
+https://www.kaggle.com/c/titanic/data
+
