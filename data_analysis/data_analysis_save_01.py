@@ -1,3 +1,5 @@
+# data_analysis_02에 나온 값을 다시 .csv로 저장하자
+
 from math import nan
 import numpy as np
 from numpy.core.numeric import NaN
@@ -35,47 +37,6 @@ df_test['Fare'] = df_test['Fare'].map(lambda i: np.log(i) if i > 0 else 0)
 
 # -----------------------------------------------------------------------------------------------------
 # Feature engineering
-'''
-# null 값을 채우자
-# 그 전에 null 값을 확인하자
-# train
-for col in df_train.columns:
-    msg = 'column: {:>12}\t Percent of NaN value: {:.2f}%'.format(col, 100*(df_train[col].isnull().sum() / df_train[col].shape[0]))
-    print(msg)
-
-# column:  PassengerId     Percent of NaN value: 0.00%
-# column:     Survived     Percent of NaN value: 0.00%
-# column:       Pclass     Percent of NaN value: 0.00%
-# column:         Name     Percent of NaN value: 0.00%
-# column:          Sex     Percent of NaN value: 0.00%
-# column:          Age     Percent of NaN value: 3.29%
-# column:        SibSp     Percent of NaN value: 0.00%
-# column:        Parch     Percent of NaN value: 0.00%
-# column:       Ticket     Percent of NaN value: 4.62%
-# column:         Fare     Percent of NaN value: 0.00%
-# column:        Cabin     Percent of NaN value: 67.87%
-# column:     Embarked     Percent of NaN value: 0.25%
-# column:   FamilySize     Percent of NaN value: 0.00%
-
-print('\n')
-# test
-for col in df_test.columns:
-    msg = 'column: {:>12}\t Percent of NaN value: {:.2f}%'.format(col, 100*(df_test[col].isnull().sum() / df_test[col].shape[0]))
-    print(msg)
-
-# column:  PassengerId     Percent of NaN value: 0.00%
-# column:       Pclass     Percent of NaN value: 0.00%
-# column:         Name     Percent of NaN value: 0.00%
-# column:          Sex     Percent of NaN value: 0.00%
-# column:          Age     Percent of NaN value: 3.49%
-# column:        SibSp     Percent of NaN value: 0.00%
-# column:        Parch     Percent of NaN value: 0.00%
-# column:       Ticket     Percent of NaN value: 5.18%
-# column:         Fare     Percent of NaN value: 0.00%
-# column:        Cabin     Percent of NaN value: 70.83%
-# column:     Embarked     Percent of NaN value: 0.28%
-# column:   FamilySize     Percent of NaN value: 0.00%
-'''
 # -----------------------------------------------------------------------------------------------------
 # age의 null 값을 채워보자
 
@@ -158,22 +119,6 @@ df_train['Sex'] = df_train['Sex'].map({'female': 0, 'male': 1})
 df_test['Sex'] = df_test['Sex'].map({'female': 0, 'male': 1})
 
 # -----------------------------------------------------------------------------------------------------
-# 히트맵으로 상관관계 그리기
-
-heatmap_data = df_train[['Survived', 'Pclass', 'Sex', 'Fare', 'Embarked', 'FamilySize', 'Age_cat']] 
-
-colormap = plt.cm.RdBu
-plt.figure(figsize=(14, 12))
-plt.title('Pearson Correlation of Features', y=1.05, size=15)
-sns.heatmap(heatmap_data.astype(float).corr(), linewidths=0.1, vmax=1.0,
-           square=True, cmap=colormap, linecolor='white', annot=True, annot_kws={"size": 16})
-# plt.show()
-
-del heatmap_data
-
-
-# -----------------------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------------
 # 모델을 위한 전처리
 # one-hot 인코딩
 
@@ -189,54 +134,11 @@ df_train.drop(['PassengerId', 'Name', 'SibSp', 'Parch', 'Fare', 'Ticket', 'Cabin
 df_test.drop(['PassengerId', 'Name',  'SibSp', 'Parch', 'Fare', 'Ticket', 'Cabin'], axis=1, inplace=True)
 
 # -----------------------------------------------------------------------------------------------------
-# 머신러닝 모델 만들기
-#importing all the required ML packages
-from sklearn.ensemble import RandomForestClassifier
-from sklearn import metrics
-from sklearn.model_selection import train_test_split 
-
-# survived 나눠서 데이터와 라벨로 지정
-X_train = df_train.drop('Survived', axis=1).values
-target_label = df_train['Survived'].values
-X_test = df_test.values
-
-# split
-X_tr, X_vld, y_tr, y_vld = train_test_split(X_train, target_label, test_size=0.3, random_state=2021)
-
-# 훈련, 예측
-model = RandomForestClassifier()
-model.fit(X_tr, y_tr)
-prediction = model.predict(X_vld)
-
-print('총 {}명 중 {:.2f}% 정확도로 생존을 맞춤'.format(y_vld.shape[0], 100 * metrics.accuracy_score(prediction, y_vld)))
-# 총 30000명 중 76.54% 정확도로 생존을 맞춤
-
 # -----------------------------------------------------------------------------------------------------
-# 학습된 모델의 Feature importance 를 확인하자
-from pandas import Series
-
-feature_importance = model.feature_importances_
-Series_feat_imp = Series(feature_importance, index=df_test.columns)
-
-plt.figure(figsize=(12, 8))
-Series_feat_imp.sort_values(ascending=True).plot.barh()
-plt.xlabel('Feature importance')
-plt.ylabel('Feature')
-# plt.show()
-
 # -----------------------------------------------------------------------------------------------------
-# 제출물 예측
-submission = pd.read_csv('D:/kaggle/sample_submission.csv')
+# .csv 로 저장하자
 
-prediction = model.predict(X_test)
-submission['Survived'] = prediction
+df_train.to_csv('D:/kaggle/0426_train.csv', index=False)
+df_test.to_csv('D:/kaggle/0426_test.csv', index=False)
 
-submission.to_csv('D:/kaggle/sub/submission_01.csv', index=False)
-
-print('==== done ====')
-
-# ========================================
-# in kaggle
-
-# submission_01
-# 0.77653 932등
+print('==== save done ====')
