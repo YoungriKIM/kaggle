@@ -10,13 +10,6 @@ from pandas import Series
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-plt.style.use('seaborn')
-sns.set(font_scale=2.5)
-import plotly.offline as py
-py.init_notebook_mode(connected=True)
-import plotly.graph_objs as go
-import plotly.tools as tls
-
 #ignore warnings
 import warnings
 warnings.filterwarnings('ignore')
