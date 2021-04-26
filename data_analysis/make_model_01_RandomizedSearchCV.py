@@ -50,9 +50,9 @@ def build_model(drop=0.2, optimizer='adam'):
     x = Dense(64, activation='relu', name='hidden3')(x)
     x = Dense(32, activation='relu', name='hidden4')(x)
     x = Dense(32, activation='relu', name='hidden5')(x)
-    outputs = Dense(1, activation='sigmoid', name='outputs')(x)
+    outputs = Dense(2, activation='sigmoid', name='outputs')(x)
     model = Model(inputs = inputs, outputs = outputs)
-    model.compile(loss = 'binary_crossentropy', optimizer=optimizer, metrics=['acc'])
+    model.compile(loss = 'sparse_categorical_crossentropy', optimizer=optimizer, metrics=['acc'])
     return model
 model2 = build_model()
 
@@ -62,7 +62,7 @@ model2 = KerasClassifier(build_model, verbose=1)
 
 # 하이퍼파라미터 지정
 def create_hyperparameters():
-    batches = [28, 34, 42, 24]
+    batches = [16, 32, 8, 5]
     optimizers = ['rmsprop', 'adam', 'adadelta']
     dropouts = [0.1, 0.2, 0.3]
     return {'batch_size': batches, 'optimizer': optimizers, 'drop': dropouts}
@@ -72,20 +72,24 @@ from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 
 search = RandomizedSearchCV(model2, hyper, cv = 3)
 
-from tensorflow.keras.callbacks import EarlyStopping
-stop = EarlyStopping(monitor='val_loss', patience=16, mode='auto')
-search.fit(x_train, y_train, epochs= 100, verbose=1, validation_split=0.2, callbacks=[stop])
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+stop = EarlyStopping(monitor='loss', patience=8, mode='min', restore_best_weights=True)
+file_dir = 'D:/kaggle/h5/ransear_01.h5'
+lr = ReduceLROnPlateau(factor = 0.25, patience = 4, verbose = 1)
+mc = ModelCheckpoint(filepath=file_dir, verbose=1, save_best_only=True)
 
-prediction = search.predict(x_val)
-
-print('총 {}명 중 {:.2f}% 정확도로 생존을 맞춤'.format(y_val.shape[0], 100 * metrics.accuracy_score(prediction, y_vld)))
+search.fit(x_train, y_train, epochs=1000, batch_size=10, validation_data=(x_val, y_val), verbose=1, callbacks=[stop, lr, mc])
 
 # -----------------------------------------------------------------------------------------------------
 # 제출물 예측
+from keras.models import load_model
+
 submission = pd.read_csv('D:/kaggle/sample_submission.csv')
 
-prediction = search.predict(x_test)
-submission['Survived'] = prediction
+model = load_model(file_dir)
+prediction = model.predict(x_test)
+prediction = np.argmax(prediction, axis=1)
+print(prediction)
 
 submission.to_csv('D:/kaggle/sub/submission_02.csv', index=False)
 
@@ -99,3 +103,6 @@ print('==== done ====')
 
 # submission_02
 # ing
+
+# submission_03 # 노 민맥스, 기본 댄스 모델
+# 0.78114
