@@ -45,41 +45,50 @@ print(x_val.shape, y_val.shape)
 # (10000, 10) (10000,)
 
 # reshape
-x_train = x_train.reshape(x_train.shape[0], 1, x_train.shape[1])
-x_val = x_val.reshape(x_val.shape[0], 1, x_val.shape[1])
-x_test = x_test.reshape(x_test.shape[0], 1, x_test.shape[1])
+x_train = x_train.reshape(x_train.shape[0], x_train.shape[1], 1)
+x_val = x_val.reshape(x_val.shape[0], x_val.shape[1], 1)
+x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], 1)
 
 
 #모델 구성
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Dropout, Input, Conv1D, MaxPooling1D, AveragePooling1D, Activation, Flatten
+from tensorflow.keras.layers import Dense, Dropout, Input, Conv1D, MaxPool1D, AveragePooling1D, Activation, Flatten, Concatenate
 
 model = Sequential()
-model.add(Conv1D(320, 2, 1, padding='same', input_shape=(x_train.shape[1:])))
-model.add(Activation('relu'))
-model.add(Dropout(0.2))
-model.add(Conv1D(320, 2, 1, padding='same'))
-model.add(Activation('relu'))
-model.add(Conv1D(240, 2, 1, padding='same'))
-model.add(Activation('relu'))
-model.add(Conv1D(240, 2, 1, padding='same'))
-model.add(Activation('relu'))
-# model.add(MaxPooling1D(2))
-# model.add(AveragePooling1D(2))
-model.add(Dropout(0.2))
-model.add(Flatten())
-model.add(Dense(240))
-model.add(Activation('relu'))
-model.add(Dense(240))
-model.add(Activation('relu'))
-model.add(Dense(180))
-model.add(Activation('relu'))
-model.add(Dense(90))
-model.add(Activation('relu'))
-model.add(Dense(30))
-model.add(Activation('relu'))
-model.add(Dense(2))
-model.add(Activation('sigmoid'))
+
+def residual_block(x, filters, conv_num=3, activation="relu"):
+    # Shortcut
+    s = Conv1D(filters, 1, padding="same")(x)
+    for i in range(conv_num - 1):
+        x = Conv1D(filters, 2, padding="same")(x)
+        x = Activation(activation)(x)
+    x = Conv1D(filters, 2, padding="same")(x)
+    # x = Add()([x, s])
+    x= Concatenate(axis=1)([x,s])
+    x = Activation(activation)(x)
+    return MaxPool1D(pool_size=2, strides=1)(x)
+
+
+def build_model(input_shape, num_classes):
+    inputs = Input(shape=input_shape, name="input")
+
+    x = residual_block(inputs, 16, 2)
+    x = residual_block(x, 32, 2)
+    x = residual_block(x, 64, 3)
+    x = residual_block(x, 128, 3)
+    x = residual_block(x, 128, 3)
+
+    x = AveragePooling1D(pool_size=2, strides=1)(x)
+    x = Flatten()(x)
+    x = Dense(256, activation="relu")(x)
+    x = Dense(128, activation="relu")(x)
+
+    outputs = Dense(num_classes, activation="sigmoid", name="output")(x)
+
+    return Model(inputs=inputs, outputs=outputs)
+
+model = build_model(x_train.shape[1:], 2)
+
 model.summary()
 
 
@@ -88,11 +97,11 @@ model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=
 
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
 stop = EarlyStopping(monitor='loss', patience=16, mode='min', restore_best_weights=True)
-file_dir = 'D:/kaggle/h5/submission_07.h5'
+file_dir = 'D:/kaggle/h5/submission_09.h5'
 lr = ReduceLROnPlateau(factor = 0.25, patience = 8, verbose = 1)
 mc = ModelCheckpoint(filepath=file_dir, verbose=1, save_best_only=True)
 
-model.fit(x_train, y_train, epochs=1000, batch_size=5, validation_data=(x_val, y_val), verbose=1, callbacks=[stop, lr, mc])
+model.fit(x_train, y_train, epochs=1000, batch_size=10, validation_data=(x_val, y_val), verbose=1, callbacks=[stop, lr, mc])
 
 # -----------------------------------------------------------------------------------------------------
 # 제출물 예측
@@ -108,7 +117,7 @@ print(prediction)
 
 submission['Survived'] = prediction
 
-submission.to_csv('D:/kaggle/sub/submission_07.csv', index=False)
+submission.to_csv('D:/kaggle/sub/submission_09.csv', index=False)
 
 print('==== done ====')
 
@@ -120,7 +129,7 @@ print('==== done ====')
 # 0.77653 932등
 
 # submission_02
-# ing
+# 0.34911 ???????
 
 # submission_03 # 노 민맥스, 기본 댄스 모델
 # 0.78114
@@ -131,6 +140,7 @@ print('==== done ====')
 
 # submission_05 # StandardScaler, CNN1
 # 9000/9000 [==============================] - 17s 2ms/step - loss: 0.4935 - acc: 0.7677 - val_loss: 0.4957 - val_acc: 0.7675
+# 학원컴 ing
 # 0.77141
 
 # submission_06 # minmax, CNN1, AveragePooling1D
@@ -138,3 +148,12 @@ print('==== done ====')
 # 0.78731
 
 # submission_07 > 하다 멈춤
+
+# submission_08
+# CNN2
+# 학원 ing
+
+# submission_09 keras 기본 모델
+# 7000/7000 [==============================] - 49s 7ms/step - loss: 0.4922 - acc: 0.7693 - val_loss: 0.4944 - val_acc: 0.7694
+# 0.78320
+
