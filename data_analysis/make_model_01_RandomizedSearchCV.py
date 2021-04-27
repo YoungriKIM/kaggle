@@ -19,8 +19,8 @@ from sklearn.model_selection import train_test_split
 
 # -----------------------------------------------------------------------------------------------------
 # 데이터 지정
-df_train = pd.read_csv('D:/kaggle/0426_train.csv')
-df_test = pd.read_csv('D:/kaggle/0426_test.csv')
+df_train = pd.read_csv('D:/kaggle/0427_train.csv')
+df_test = pd.read_csv('D:/kaggle/0427_test.csv')
 
 print(df_train[:5])
 print(df_test[:5])
@@ -30,8 +30,14 @@ x_train = df_train.drop('Survived', axis=1).values
 y_train = df_train['Survived'].values
 x_test = df_test.values
 
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+scaler.fit(x_train)
+x_train = scaler.transform(x_train)
+x_test = scaler.transform(x_test)
+
 # split
-x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, shuffle=True, test_size=0.1, random_state=519)
+x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, shuffle=True, test_size=0.3, random_state=519)
 
 # print(x_train.shape, y_train.shape)
 # print(x_val.shape, y_val.shape)
@@ -64,7 +70,7 @@ model2 = KerasClassifier(build_model, verbose=1)
 def create_hyperparameters():
     batches = [16, 32, 8, 5]
     optimizers = ['rmsprop', 'adam', 'adadelta']
-    dropouts = [0.1, 0.2, 0.3]
+    dropouts = [0.2, 0.3, 0.5]
     return {'batch_size': batches, 'optimizer': optimizers, 'drop': dropouts}
 hyper = create_hyperparameters()
 
@@ -79,6 +85,8 @@ lr = ReduceLROnPlateau(factor = 0.25, patience = 4, verbose = 1)
 mc = ModelCheckpoint(filepath=file_dir, verbose=1, save_best_only=True)
 
 search.fit(x_train, y_train, epochs=1000, batch_size=10, validation_data=(x_val, y_val), verbose=1, callbacks=[stop, lr, mc])
+
+print('best_params_: ', search.best_params_)
 
 # -----------------------------------------------------------------------------------------------------
 # 제출물 예측
@@ -101,8 +109,9 @@ print('==== done ====')
 # submission_01
 # 0.77653 932등
 
-# submission_02
-# ing
+# submission_02 랜덤서치
+# 0.34911
+# 장난하나?
 
 # submission_03 # 노 민맥스, 기본 댄스 모델
 # 0.78114
