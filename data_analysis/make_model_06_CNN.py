@@ -86,7 +86,11 @@ model.summary()
 #컴파일, 훈련
 from tensorflow.keras.optimizers import SGD, RMSprop, Adagrad, Adadelta, Adam
 
+<<<<<<< HEAD
 model.compile(loss='sparse_categorical_crossentropy', optimizer=SGD(lr=0.1), metrics=['acc'])
+=======
+model.compile(loss='sparse_categorical_crossentropy', optimizer=Adam(lr=0.1), metrics=['acc'])
+>>>>>>> 3ea26d3fe05deb1dad4d912ac88003632ad3c404
 
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
 stop = EarlyStopping(monitor='loss', patience=16, mode='min', restore_best_weights=True)
@@ -141,13 +145,20 @@ print('==== done ====')
 
 # submission_07 > 하다 멈춤
 
+<<<<<<< HEAD
 # submission_08 SGD
+=======
+# submission_08
+# CNN2
+# 학원 ing
+>>>>>>> 3ea26d3fe05deb1dad4d912ac88003632ad3c404
 
 # submission_09 keras 기본 모델
 # 7000/7000 [==============================] - 49s 7ms/step - loss: 0.4922 - acc: 0.7693 - val_loss: 0.4944 - val_acc: 0.7694
 # 0.78320
 
 # submission_010
+<<<<<<< HEAD
 # 7000/7000 [==============================] - 78s 11ms/step - loss: 0.6964 - acc: 0.5561 - val_loss: 0.6905 - val_acc: 0.5698 # 그만
 
 # submission_011 Adam # 그만
@@ -157,3 +168,12 @@ print('==== done ====')
 
 # submission_012 
 # 06바탕으로 SGD, RMSprop, Adadelte 돌리기
+=======
+# 7000/7000 [==============================] - 78s 11ms/step - loss: 0.6964 - acc: 0.5561 - val_loss: 0.6905 - val_acc: 0.5698
+# 그만
+
+# submission_011 Adam
+# 학원컴
+
+# submission_011 SGD
+>>>>>>> 3ea26d3fe05deb1dad4d912ac88003632ad3c404
