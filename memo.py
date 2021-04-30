@@ -1,4 +1,12 @@
-import pandas as pd
+import os 
 
-pd.read_csv("D:/kaggle/ensemble/dae.csv")
-pd.read_csv("D:/kaggle/sub/pseudo_label.csv")
+path_a = 'why not'
+path_b = 'youngri zzang'
+path_list = [path_a, path_b]
+
+print([v for v in path_list][:])
+
+
+
+# file_list = os.listdir([v for v in path_list])
+# print(file_list)

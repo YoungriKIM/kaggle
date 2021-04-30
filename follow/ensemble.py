@@ -19,7 +19,7 @@ sub4 = pd.read_csv('D:/kaggle/ensemble/voting_submission.csv')
 res = (2*sub1['Survived'] + sub2['Survived'] + sub3['Survived'] + 2*sub4['Survived'])/6
 sub.Survived = np.where(res > 0.5, 1, 0).astype(int)
 
-sub.to_csv("D:/kaggle/sub/submission.csv", index = False)
+sub.to_csv("D:/kaggle/sub/submission_01.csv", index = False)
 sub['Survived'].mean()
 
 print('==== done ====')

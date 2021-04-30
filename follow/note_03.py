@@ -27,7 +27,7 @@ from xgboost import XGBClassifier
 TARGET = 'Survived'
 
 N_ESTIMATORS = 1000
-N_SPLITS = 10
+N_SPLITS = 100
 SEED = 2021
 EARLY_STOPPING_ROUNDS = 100
 VERBOSE = 100

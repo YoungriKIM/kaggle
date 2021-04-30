@@ -28,7 +28,7 @@ warnings.simplefilter('ignore')
 TARGET = 'Survived'
 
 N_ESTIMATORS = 1000
-N_SPLITS = 10
+N_SPLITS = 50
 SEED = 2021
 EARLY_STOPPING_ROUNDS = 100
 VERBOSE = 100
@@ -47,7 +47,7 @@ set_seed(SEED)
 train_df = pd.read_csv('D:/kaggle/train.csv')
 test_df = pd.read_csv('D:/kaggle/test.csv')
 submission = pd.read_csv('D:/kaggle/sample_submission.csv')
-test_df[TARGET] = pd.read_csv("D:/kaggle/sub/ensemble_01.csv")[TARGET]
+test_df[TARGET] = pd.read_csv("D:/kaggle/pseudo_label_02.csv")[TARGET]
 
 all_df = pd.concat([train_df, test_df]).reset_index(drop=True)
 
@@ -330,11 +330,11 @@ submission.drop([col for col in submission.columns if col.startswith('submit_')]
 # ----------------------------------------------------------------------
 # Ensemble/Submission
 submission['submit_1'] = submission[TARGET].copy()
-submission['submit_2'] = pd.read_csv("D:/kaggle/sub/note_01.csv")[TARGET]
-submission['submit_3'] = pd.read_csv("D:/kaggle/sub/ensemble_02.csv")[TARGET]
+submission['submit_2'] = pd.read_csv("D:/kaggle/sub/ensemble_03.csv")[TARGET]
+submission['submit_3'] = pd.read_csv("D:/kaggle/sub/submission_01.csv")[TARGET]
 
 submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis = 1).value_counts()
 
 submission[TARGET] = (submission[[col for col in submission.columns if col.startswith('submit_')]].sum(axis=1) >= 2).astype(int)
 
-submission[['PassengerId', TARGET]].to_csv("D:/kaggle/sub/ensemble_03.csv", index = False)
+submission[['PassengerId', TARGET]].to_csv("D:/kaggle/sub/ensemble_6_fold50.csv", index = False)
