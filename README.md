@@ -1,2 +1,2 @@
 # kaggle
-Challenge the kaggle competition!
+Let's play in the Kaggle Competition!
